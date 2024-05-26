@@ -15,8 +15,9 @@ public class OfflineActivity extends AppCompatActivity {
         Button easy = (Button) findViewById(R.id.button_easy);
         Button normal = (Button) findViewById(R.id.button_normal);
         Button difficult =(Button) findViewById((R.id.button_difficult));
+
         //获取音乐开关
-        //getIntent()
+        boolean music = getIntent().getBooleanExtra("music",false);
 
         easy.setOnClickListener(new View.OnClickListener() {
             @Override
