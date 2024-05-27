@@ -1,10 +1,13 @@
-package com.example.aircarftwar2024;
+package com.example.aircarftwar2024.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.example.aircarftwar2024.R;
 
 public class OfflineActivity extends AppCompatActivity {
 
@@ -18,10 +21,14 @@ public class OfflineActivity extends AppCompatActivity {
 
         //获取音乐开关
         boolean music = getIntent().getBooleanExtra("music",false);
+        Intent intent = new Intent(OfflineActivity.this,GameActivity.class);
 
         easy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                intent.putExtra("difficulty","easy");
+                intent.putExtra("music",music);
+                startActivity(intent);
 
             }
         });
@@ -29,6 +36,9 @@ public class OfflineActivity extends AppCompatActivity {
         normal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                intent.putExtra("difficulty","normal");
+                intent.putExtra("music",music);
+                startActivity(intent);
 
             }
         });
@@ -36,6 +46,9 @@ public class OfflineActivity extends AppCompatActivity {
         difficult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                intent.putExtra("difficulty","difficult");
+                intent.putExtra("music",music);
+                startActivity(intent);
 
             }
         });
