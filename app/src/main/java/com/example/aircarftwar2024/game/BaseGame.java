@@ -468,7 +468,7 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     private void paintScoreAndLife() {
         if (canvas != null) {
             canvas.drawText("Score: " + score, 100, 50, mPaint);
-            canvas.drawText("Life: " + heroAircraft.hp, 100, 100, mPaint);
+            canvas.drawText("Life: " + heroAircraft.getHp(), 100, 100, mPaint);
         }
     }
 
@@ -487,37 +487,15 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
     mbLoop = false;  // 结束线程循环
-    boolean retry = true;
-    while (retry) {
-        try {
-            thread.join();
-            retry = false;
-        } catch (InterruptedException e) {
-        }
-    }
+
     }
 
     @Override
     public void run() {
             while (mbLoop) {
-        try {
-            canvas = mSurfaceHolder.lockCanvas();
-            synchronized (mSurfaceHolder) {
-                if (canvas != null) {
-                    paintScoreAndLife();  // 绘制分数和生命值
-                }
-            }
-        } finally {
-            if (canvas != null) {
-                mSurfaceHolder.unlockCanvasAndPost(canvas);
-            }
-        }
-        try {
-            Thread.sleep(16);  
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+                action();
+                draw();
     }
 }
-    }
 }
+

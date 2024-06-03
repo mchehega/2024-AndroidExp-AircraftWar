@@ -19,7 +19,7 @@ import com.example.aircarftwar2024.game.MediumGame;
 public class GameActivity extends AppCompatActivity {
     private static final String TAG = "GameActivity";
 
-    private int gameType=0;
+    private String  gameType;
     public static int screenWidth,screenHeight;
 
     @Override
@@ -29,12 +29,19 @@ public class GameActivity extends AppCompatActivity {
         getScreenHW();
 
         if(getIntent() != null){
-            gameType = getIntent().getIntExtra("gameType",1);
+            gameType = getIntent().getStringExtra("difficulty");
         }
 
         /*TODO:根据用户选择的难度加载相应的游戏界面*/
         BaseGame baseGameView = null;
+        if (gameType.equals("easy"))
+        {
+            baseGameView = new EasyGame(GameActivity.this);
+        }
         setContentView(baseGameView);
+
+
+
     }
 
     public void getScreenHW(){
