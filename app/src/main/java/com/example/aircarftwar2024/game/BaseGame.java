@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -43,6 +45,7 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     private final SurfaceHolder mSurfaceHolder;
     private Canvas canvas;  //绘图的画布
     private final Paint mPaint;
+    private Handler gameHandler;
 
     //点击屏幕位置
     float clickX = 0, clickY=0;
@@ -129,9 +132,9 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     private final EnemyFactory bossEnemyFactory;
     private final Random random = new Random();
 
-    public BaseGame(Context context){
+    public BaseGame(Context context, Handler handler){
         super(context);
-
+        this.gameHandler = handler;
         mbLoop = true;
         mPaint = new Paint();  //设置画笔
         mSurfaceHolder = this.getHolder();
@@ -151,7 +154,6 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
         mobEnemyFactory = new MobFactory();
         eliteEnemyFactory = new EliteFactory();
         bossEnemyFactory = new BossFactory();
-
         heroController();
     }
     private void heroShootAction() {
@@ -409,6 +411,9 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
 
         if (heroAircraft.notValid()) {
             gameOverFlag = true;
+            Message msg = Message.obtain();
+            msg.what = 1;
+            gameHandler.sendMessage(msg);
             mbLoop = false;
             Log.i(TAG, "heroAircraft is not Valid");
         }
@@ -467,15 +472,17 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
 
     private void paintScoreAndLife() {
         if (canvas != null) {
-            canvas.drawText("Score: " + score, 100, 50, mPaint);
-            canvas.drawText("Life: " + heroAircraft.hp, 100, 100, mPaint);
+            Paint paint = new Paint();
+            paint.setTextSize(65);//设置字体大小
+            canvas.drawText("Score: " + score, 100, 50, paint);
+            canvas.drawText("Life: " + heroAircraft.getHp(), 100, 100, paint);
         }
     }
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
             mbLoop = true;  // 开始线程循环
-    new Thread(this).start();
+            new Thread(this).start();
     }
 
     @Override
@@ -487,37 +494,18 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
     mbLoop = false;  // 结束线程循环
-    boolean retry = true;
-    while (retry) {
-        try {
-            thread.join();
-            retry = false;
-        } catch (InterruptedException e) {
-        }
-    }
     }
 
     @Override
     public void run() {
-            while (mbLoop) {
-        try {
-            canvas = mSurfaceHolder.lockCanvas();
-            synchronized (mSurfaceHolder) {
-                if (canvas != null) {
-                    paintScoreAndLife();  // 绘制分数和生命值
-                }
-            }
-        } finally {
-            if (canvas != null) {
-                mSurfaceHolder.unlockCanvasAndPost(canvas);
+        while (mbLoop){
+            action();
+            draw();
+            try {
+                Thread.sleep(timeInterval);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-        try {
-            Thread.sleep(16);  
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }
-    }
 }
