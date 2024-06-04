@@ -16,6 +16,7 @@
             android:name=".activity.OfflineActivity"
             android:exported="false" />
         <activity android:name=".activity.GameActivity"/>
+        <activity android:name=".activity.LeaderBoardActivity"/>
         <activity
             android:name=".activity.MainActivity"
             android:exported="true">

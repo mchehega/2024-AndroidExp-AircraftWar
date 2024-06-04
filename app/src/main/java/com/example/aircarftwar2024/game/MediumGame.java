@@ -6,8 +6,8 @@ import android.os.Handler;
 import com.example.aircarftwar2024.ImageManager;
 
 public class MediumGame extends BaseGame{
-    public MediumGame(Context context, Handler handler) {
-        super(context, handler);
+    public MediumGame(Context context, Handler handler,int difficulty) {
+        super(context, handler,difficulty);
         this.backGround = ImageManager.BACKGROUND2_IMAGE;
         this.enemyMaxNumber = 3;
         this.heroShootCycle = 9;
