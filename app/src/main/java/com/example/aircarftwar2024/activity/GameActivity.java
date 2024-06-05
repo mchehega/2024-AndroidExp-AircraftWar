@@ -46,6 +46,7 @@ public class GameActivity extends AppCompatActivity {
                 super.handleMessage(msg);
                 if (msg.what == 1){
                     Intent intent = new Intent(GameActivity.this, LeaderBoardActivity.class);
+                    intent.putExtra("difficulty",gameType);
                     startActivity(intent);
                 }
             }
@@ -53,11 +54,11 @@ public class GameActivity extends AppCompatActivity {
         /*TODO:根据用户选择的难度加载相应的游戏界面*/
         BaseGame baseGameView = null;
         if (gameType.equals("easy")){
-            baseGameView = new EasyGame(GameActivity.this, mHandler);
-        } else if (gameType.equals("medium")){
-            baseGameView = new MediumGame(GameActivity.this, mHandler);
-        } else if (gameType.equals("hard")) {
-            baseGameView = new HardGame(GameActivity.this, mHandler);
+            baseGameView = new EasyGame(GameActivity.this, mHandler,0);
+        } else if (gameType.equals("normal")){
+            baseGameView = new MediumGame(GameActivity.this, mHandler,1);
+        } else if (gameType.equals("difficult")) {
+            baseGameView = new HardGame(GameActivity.this, mHandler,2);
         }
         setContentView(baseGameView);
 

@@ -29,7 +29,6 @@ public class OfflineActivity extends AppCompatActivity {
                 intent.putExtra("difficulty","easy");
                 intent.putExtra("music",music);
                 startActivity(intent);
-
             }
         });
 

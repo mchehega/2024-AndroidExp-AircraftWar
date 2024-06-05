@@ -11,8 +11,12 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
 import androidx.annotation.NonNull;
 import com.example.aircarftwar2024.ImageManager;
+import com.example.aircarftwar2024.R;
 import com.example.aircarftwar2024.activity.GameActivity;
 import com.example.aircarftwar2024.aircraft.AbstractAircraft;
 import com.example.aircarftwar2024.aircraft.AbstractEnemyAircraft;
@@ -24,10 +28,17 @@ import com.example.aircarftwar2024.factory.enemy_factory.BossFactory;
 import com.example.aircarftwar2024.factory.enemy_factory.EliteFactory;
 import com.example.aircarftwar2024.factory.enemy_factory.EnemyFactory;
 import com.example.aircarftwar2024.factory.enemy_factory.MobFactory;
+import com.example.aircarftwar2024.scorerank.Difficulty;
+import com.example.aircarftwar2024.scorerank.Score;
+import com.example.aircarftwar2024.scorerank.ScoreDaoImpl;
 import com.example.aircarftwar2024.supply.AbstractFlyingSupply;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -41,6 +52,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Runnable{
 
     public static final String TAG = "BaseGame";
+
+    private int difficulty;
+    Difficulty difficulty1;
+
     boolean mbLoop; //控制绘画线程的标志位
     private final SurfaceHolder mSurfaceHolder;
     private Canvas canvas;  //绘图的画布
@@ -132,9 +147,13 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     private final EnemyFactory bossEnemyFactory;
     private final Random random = new Random();
 
-    public BaseGame(Context context, Handler handler){
+    private Context context;
+
+    public BaseGame(Context context, Handler handler,int difficulty){
         super(context);
+        this.context = context;
         this.gameHandler = handler;
+        this.difficulty = difficulty;
         mbLoop = true;
         mPaint = new Paint();  //设置画笔
         mSurfaceHolder = this.getHolder();
@@ -155,6 +174,17 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
         eliteEnemyFactory = new EliteFactory();
         bossEnemyFactory = new BossFactory();
         heroController();
+
+        if (difficulty == 0)
+        {
+            difficulty1 = Difficulty.easy;
+        }else {
+            if (difficulty==1){
+                difficulty1 = Difficulty.normal;
+            }else {
+                difficulty1 = Difficulty.difficult;
+            }
+        }
     }
     private void heroShootAction() {
         // 英雄射击
@@ -208,7 +238,11 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
                 e.printStackTrace();
             }
             // 后处理
-            postProcessAction();
+            try {
+                postProcessAction();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         };
         task.run();
     }
@@ -403,7 +437,7 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
      * <p>
      * 无效的原因可能是撞击或者飞出边界
      */
-    private void postProcessAction() {
+    private void postProcessAction() throws FileNotFoundException {
         enemyBullets.removeIf(AbstractFlyingObject::notValid);
         heroBullets.removeIf(AbstractFlyingObject::notValid);
         enemyAircrafts.removeIf(AbstractFlyingObject::notValid);
@@ -413,12 +447,16 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
             gameOverFlag = true;
             Message msg = Message.obtain();
             msg.what = 1;
+
             gameHandler.sendMessage(msg);
             mbLoop = false;
             Log.i(TAG, "heroAircraft is not Valid");
+            ScoreDaoImpl scoreDaoImpl = new ScoreDaoImpl(context);
+            scoreDaoImpl.add(new Score("test",score,difficulty1));
         }
 
     }
+
 
     public void draw() {
         canvas = mSurfaceHolder.lockCanvas();
@@ -501,11 +539,6 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
         while (mbLoop){
             action();
             draw();
-            try {
-                Thread.sleep(timeInterval);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
 }
 }
