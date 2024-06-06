@@ -447,7 +447,7 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
             gameOverFlag = true;
             Message msg = Message.obtain();
             msg.what = 1;
-
+            Log.d(TAG, "sile");
             gameHandler.sendMessage(msg);
             mbLoop = false;
             Log.i(TAG, "heroAircraft is not Valid");
