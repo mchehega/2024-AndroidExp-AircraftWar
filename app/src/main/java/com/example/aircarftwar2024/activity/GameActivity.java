@@ -46,7 +46,8 @@ public class GameActivity extends AppCompatActivity {
                 super.handleMessage(msg);
                 if (msg.what == 1){
                     Intent intent = new Intent(GameActivity.this, LeaderBoardActivity.class);
-                    intent.putExtra("difficulty",gameType);
+                    intent.putExtra("difficulty", gameType);
+                    Log.d(TAG, "准备跳转");
                     startActivity(intent);
                 }
             }
