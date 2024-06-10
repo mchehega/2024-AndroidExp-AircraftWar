@@ -1,14 +1,14 @@
-package com.example.aircarftwar2024.music
+package com.example.aircarftwar2024.music;
 import android.content.Context;
 import android.media.MediaPlayer;
-import com.example.aircarftwar2024.R
+import com.example.aircarftwar2024.R;
 public class MyMediaPlayer {
     private MediaPlayer bgmp;
     private MediaPlayer bossmp;
-    private boolen on = false;
-    public MyMediaPlayer(Context context, boolen music_c){
+    private boolean on = false;
+    public MyMediaPlayer(Context context, boolean music_c){
         bgmp = MediaPlayer.create(context, R.raw.bgm);
-        bossmp = MediaPlayer.create(context, R.raw.boss_bgm);
+        bossmp = MediaPlayer.create(context, R.raw.bgm_boss);
         on = music_c;
     }
     public void playBgm(){
@@ -22,12 +22,12 @@ public class MyMediaPlayer {
     }
     public void playBoss(){
         if (on == false) return;
-        boss_bgm.start();
-        boss_bgm.setLooping(true);
+        bossmp.start();
+        bossmp.setLooping(true);
     }
     public void stopBoss(){
         if (on == false) return;
-        boss_bgm.stop();
+        bossmp.stop();
     }
     public void continueBgm(){
         if (on == false) return;
@@ -38,8 +38,8 @@ public class MyMediaPlayer {
     public void stopAll(){
         if (on == false) return;
         bgmp.stop();
-        boss_bgm.stop();
+        bossmp.stop();
         bgmp.release();
-        boss_bgm.release();
+        bossmp.release();
     }
 }

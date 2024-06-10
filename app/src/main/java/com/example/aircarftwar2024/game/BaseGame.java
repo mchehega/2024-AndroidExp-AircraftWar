@@ -150,7 +150,7 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     private Context context;
     private MyMediaPlayer mediaPlayer;
 
-    public BaseGame(Context context, Handler handler,int difficulty, boolen music){
+    public BaseGame(Context context, Handler handler,int difficulty, boolean music){
         super(context);
         this.context = context;
         this.gameHandler = handler;

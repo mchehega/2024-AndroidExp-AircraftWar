@@ -38,9 +38,10 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getScreenHW();
 
+        boolean music = false;
         if(getIntent() != null){
             gameType = getIntent().getStringExtra("difficulty");
-            boolen music = getIntent().getStringExtra("music");
+            music = getIntent().getBooleanExtra("music", false);
         }
         mHandler = new Handler(Looper.getMainLooper()){
             @Override

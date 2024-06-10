@@ -9,8 +9,8 @@ import com.example.aircarftwar2024.aircraft.AbstractEnemyAircraft;
 import java.util.List;
 
 public class HardGame extends BaseGame{
-    public HardGame(Context context, Handler handler,int difficulty) {
-        super(context, handler,difficulty);
+    public HardGame(Context context, Handler handler,int difficulty, boolean music) {
+        super(context, handler,difficulty, music);
         this.backGround = ImageManager.BACKGROUND3_IMAGE;
         this.enemyMaxNumber = 5;
         this.heroShootCycle = 8;
