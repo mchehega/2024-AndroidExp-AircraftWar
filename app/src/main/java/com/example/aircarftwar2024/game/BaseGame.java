@@ -32,7 +32,7 @@ import com.example.aircarftwar2024.scorerank.Difficulty;
 import com.example.aircarftwar2024.scorerank.Score;
 import com.example.aircarftwar2024.scorerank.ScoreDaoImpl;
 import com.example.aircarftwar2024.supply.AbstractFlyingSupply;
-
+import com.example.aircarftwar2024.music.*;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -148,8 +148,9 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     private final Random random = new Random();
 
     private Context context;
+    private MyMediaPlayer mediaPlayer;
 
-    public BaseGame(Context context, Handler handler,int difficulty){
+    public BaseGame(Context context, Handler handler,int difficulty, boolen music){
         super(context);
         this.context = context;
         this.gameHandler = handler;
@@ -170,6 +171,7 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
         enemyBullets = new CopyOnWriteArrayList<>();
         flyingSupplies = new CopyOnWriteArrayList<>();
 
+        mediaPlayer = new MyMediaPlayer(context, music);
         mobEnemyFactory = new MobFactory();
         eliteEnemyFactory = new EliteFactory();
         bossEnemyFactory = new BossFactory();
@@ -264,6 +266,8 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
         if (this.getScore() >= bossScoreThreshold && !this.existBoss()) {
             bossScoreThreshold += bossScoreThreshold;
             res.add(bossEnemyFactory.createEnemyAircraft(bossLevel));
+            mediaPlayer.pauseBgm();
+            mediaPlayer.playBoss();
         }
         return res;
     }
@@ -404,6 +408,10 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
                     enemyAircraft.decreaseHp(bullet.getPower());
                     bullet.vanish();
                     if (enemyAircraft.notValid()) {
+                        if (enemyAircraft instanceof BossEnemy){
+                            mediaPlayer.stopBoss();
+                            mediaPlayer.continueBgm();
+                        }
                         //获得分数，产生道具补给
                         score += enemyAircraft.score();
                         flyingSupplies.addAll(enemyAircraft.generateSupplies());
@@ -536,10 +544,12 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
 
     @Override
     public void run() {
+        mediaPlayer.playBgm();
         while (mbLoop){
             action();
             draw();
         }
+        mediaPlayer.stopAll();
 }
     public void restart(){
         heroAircraft.fuhuo();

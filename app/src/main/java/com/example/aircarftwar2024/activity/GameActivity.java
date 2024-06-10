@@ -40,6 +40,7 @@ public class GameActivity extends AppCompatActivity {
 
         if(getIntent() != null){
             gameType = getIntent().getStringExtra("difficulty");
+            boolen music = getIntent().getStringExtra("music");
         }
         mHandler = new Handler(Looper.getMainLooper()){
             @Override
@@ -55,11 +56,11 @@ public class GameActivity extends AppCompatActivity {
         /*TODO:根据用户选择的难度加载相应的游戏界面*/
         BaseGame baseGameView = null;
         if (gameType.equals("easy")){
-            baseGameView = new EasyGame(GameActivity.this, mHandler,0);
+            baseGameView = new EasyGame(GameActivity.this, mHandler,0, music);
         } else if (gameType.equals("normal")){
-            baseGameView = new MediumGame(GameActivity.this, mHandler,1);
+            baseGameView = new MediumGame(GameActivity.this, mHandler,1, music);
         } else if (gameType.equals("difficult")) {
-            baseGameView = new HardGame(GameActivity.this, mHandler,2);
+            baseGameView = new HardGame(GameActivity.this, mHandler,2, music);
         }
         HeroAircraft.getHeroAircraft().fuhuo();
         setContentView(baseGameView);
