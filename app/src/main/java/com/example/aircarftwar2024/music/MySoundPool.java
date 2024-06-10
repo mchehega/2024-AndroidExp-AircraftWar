@@ -14,7 +14,7 @@ public class MySoundPool {
     AudioAttributes audioAttributes = null;
     Context context;
     Map<Integer,Integer> soundpoolMap = new HashMap<>();
-    MySoundPool(Context context){
+    public MySoundPool(Context context){
         this.context = context;
         audioAttributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_MEDIA)

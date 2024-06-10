@@ -41,7 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
-import MySoundPoll;
+import com.example.aircarftwar2024.music.MySoundPool;
+import com.example.aircarftwar2024.supply.BombSupply;
 
 
 /**
@@ -53,7 +54,7 @@ import MySoundPoll;
 public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Runnable{
 
     public static final String TAG = "BaseGame";
-
+    MySoundPool mySoundPool ;
     private int difficulty;
     Difficulty difficulty1;
 
@@ -151,6 +152,8 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     private Context context;
     private MyMediaPlayer mediaPlayer;
 
+    boolean music;
+
     public BaseGame(Context context, Handler handler,int difficulty, boolean music){
         super(context);
         this.context = context;
@@ -188,6 +191,8 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
                 difficulty1 = Difficulty.difficult;
             }
         }
+        mySoundPool = new MySoundPool(context);
+        this.music = music;
     }
     private void heroShootAction() {
         // 英雄射击
@@ -387,7 +392,11 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
                 continue;
             }
             if (heroAircraft.crash(bullet)) {
-                play_bullet_hit();
+                if(music)
+                {
+                    mySoundPool.play_bullet_hit();
+                }
+
                 heroAircraft.decreaseHp(bullet.getPower());
                 bullet.vanish();
             }
@@ -407,6 +416,10 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
                 if (enemyAircraft.crash(bullet)) {
                     // 敌机撞击到英雄机子弹
                     // 敌机损失一定生命值
+                    if(music)
+                    {
+                        mySoundPool.play_bullet_hit();
+                    }
                     enemyAircraft.decreaseHp(bullet.getPower());
                     bullet.vanish();
                     if (enemyAircraft.notValid()) {
@@ -433,6 +446,11 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
                 continue;
             }
             if (heroAircraft.crash(flyingSupply) || flyingSupply.crash(heroAircraft)) {
+                if (!(flyingSupply instanceof BombSupply) && music)
+                {
+                    mySoundPool.play_get_supply();
+                }
+
                 flyingSupply.activate();
                 flyingSupply.vanish();
             }
@@ -463,6 +481,11 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
             Log.i(TAG, "heroAircraft is not Valid");
             ScoreDaoImpl scoreDaoImpl = new ScoreDaoImpl(context);
             scoreDaoImpl.add(new Score("test",score,difficulty1));
+            if (music)
+            {
+                mySoundPool.play_game_over();
+            }
+
         }
 
     }
