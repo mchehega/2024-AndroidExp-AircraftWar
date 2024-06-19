@@ -7,7 +7,7 @@ import com.example.aircarftwar2024.ImageManager;
 
 public class MediumGame extends BaseGame{
     public MediumGame(Context context, Handler handler,int difficulty, boolean music) {
-        super(context, handler,difficulty, music);
+        super(context, handler,difficulty, music, false);
         this.backGround = ImageManager.BACKGROUND2_IMAGE;
         this.enemyMaxNumber = 3;
         this.heroShootCycle = 9;

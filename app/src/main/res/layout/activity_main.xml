@@ -25,6 +25,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginTop="76dp" />
 
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:id="@+id/coop"
+        android:text="联机游戏"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/start"
+        android:layout_marginTop="76dp" />
+
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

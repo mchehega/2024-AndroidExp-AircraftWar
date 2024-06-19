@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import com.example.aircarftwar2024.ImageManager;
 import com.example.aircarftwar2024.R;
 import com.example.aircarftwar2024.activity.GameActivity;
+import com.example.aircarftwar2024.activity.MainActivity;
 import com.example.aircarftwar2024.aircraft.AbstractAircraft;
 import com.example.aircarftwar2024.aircraft.AbstractEnemyAircraft;
 import com.example.aircarftwar2024.aircraft.BossEnemy;
@@ -52,6 +53,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Runnable{
 
     public static final String TAG = "BaseGame";
+    int last_score=0;
 
     private int difficulty;
     Difficulty difficulty1;
@@ -61,7 +63,7 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     private Canvas canvas;  //绘图的画布
     private final Paint mPaint;
     private Handler gameHandler;
-
+    private boolean online;
     //点击屏幕位置
     float clickX = 0, clickY=0;
 
@@ -146,12 +148,15 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
     private final EnemyFactory eliteEnemyFactory;
     private final EnemyFactory bossEnemyFactory;
     private final Random random = new Random();
+    private int enemy_score = 0;
+    private int enemy_alive = 1;
 
     private Context context;
     private MyMediaPlayer mediaPlayer;
 
-    public BaseGame(Context context, Handler handler,int difficulty, boolean music){
+    public BaseGame(Context context, Handler handler,int difficulty, boolean music, boolean online){
         super(context);
+        this.online = online;
         this.context = context;
         this.gameHandler = handler;
         this.difficulty = difficulty;
@@ -224,7 +229,11 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
                 }
 
             }
-
+            try {
+                getServer();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             // 子弹移动
             bulletsMoveAction();
             // 飞机移动
@@ -243,6 +252,8 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
             try {
                 postProcessAction();
             } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         };
@@ -270,6 +281,35 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
             mediaPlayer.playBoss();
         }
         return res;
+    }
+    public void getServer() throws InterruptedException {
+        if (MainActivity.fromserver!=null)
+        {
+            int alive = 0;
+            if (HeroAircraft.getHeroAircraft().notValid()){
+                alive = 0;
+            } else{
+                alive = 1;
+            }
+            if (!MainActivity.fromserver.equals("start")){
+                String[] a = MainActivity.fromserver.split(",");
+                System.out.println(MainActivity.fromserver);
+                enemy_score = Integer.parseInt(a[0]);
+                enemy_alive = Integer.parseInt(a[1]);
+                System.out.println(enemy_score);
+        }
+            //System.out.println(score + "," + alive);
+            if (last_score != score)
+            {
+                MainActivity.writer.println(score + "," + alive);
+                last_score = score;
+            }
+            if(heroAircraft.notValid())
+            {
+                MainActivity.writer.println(score + "," + alive);
+                Thread.sleep(200);
+            }
+        }
     }
     public int getScore() {
         return score;
@@ -445,19 +485,32 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
      * <p>
      * 无效的原因可能是撞击或者飞出边界
      */
-    private void postProcessAction() throws FileNotFoundException {
+    private void postProcessAction() throws FileNotFoundException, InterruptedException {
         enemyBullets.removeIf(AbstractFlyingObject::notValid);
         heroBullets.removeIf(AbstractFlyingObject::notValid);
         enemyAircrafts.removeIf(AbstractFlyingObject::notValid);
         flyingSupplies.removeIf(AbstractFlyingObject::notValid);
 
         if (heroAircraft.notValid()) {
+            mbLoop = false;
+            if (online){
+                while (enemy_alive == 1) {
+                    getServer();
+                    draw();
+                }
+            }
+            getServer();
+            draw();
             gameOverFlag = true;
             Message msg = Message.obtain();
             msg.what = 1;
-            Log.d(TAG, "sile");
+            List<Integer> list= new ArrayList<Integer>();
+            list.add(score);
+            list.add(enemy_score);
+            msg.obj = list;
+
+            Log.d("abc", ((ArrayList)msg.obj).get(0)+"");
             gameHandler.sendMessage(msg);
-            mbLoop = false;
             Log.i(TAG, "heroAircraft is not Valid");
             ScoreDaoImpl scoreDaoImpl = new ScoreDaoImpl(context);
             scoreDaoImpl.add(new Score("test",score,difficulty1));
@@ -522,6 +575,9 @@ public abstract class BaseGame extends SurfaceView implements SurfaceHolder.Call
             paint.setTextSize(65);//设置字体大小
             canvas.drawText("Score: " + score, 100, 50, paint);
             canvas.drawText("Life: " + heroAircraft.getHp(), 100, 100, paint);
+            if (online){
+                canvas.drawText("Enemy Score: " + enemy_score, 100, 150, paint);
+            }
         }
     }
 
